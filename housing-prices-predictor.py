@@ -13,10 +13,6 @@ class MultivariateLinearRegression:
         self.num_instances = data['data'].shape[0]
         self.feature_names = data['feature_names']
         self.target_name = data['target_names']
-        self.alpha = 0.001
-        self.cltd_costs = []
-        self.betas = []
-        self.thetas = []
         self._curr_theta = np.zeros((self.num_features))
         self._curr_beta = 0
         self.epochs = epochs
