@@ -9,8 +9,8 @@ from sklearn.metrics import mean_squared_error
 class MultivariateLinearRegression:
     def __init__(self, data, epochs=10000, learning_rate=0.003):
         self.X_trains, self.X_tests, self.Y_trains, self.Y_tests = train_test_split(data['data'], data['target'], test_size=0.3, random_state=0)
-        self.num_features = data['data'].shape[1]
-        self.num_instances = data['data'].shape[0]
+        self.num_features = self.X_trains.shape[1]
+        self.num_instances = self.X_trains.shape[0]
         self.feature_names = data['feature_names']
         self.target_name = data['target_names']
         self._curr_theta = np.zeros((self.num_features))
@@ -60,7 +60,9 @@ class MultivariateLinearRegression:
         zeros = np.zeros((self.num_instances,))
         
         for feature_col_i in range(self.num_features):
-            curr_feature = self.X_trains[:, feature_col_i]
+            curr_feature = self.X_trains[:, feature_col_i].reshape(-1)
+            print(curr_feature.shape)
+            print(zeros.shape)
             plt.scatter(curr_feature, zeros, alpha=0.25, marker='p', c='#036bfc')
             print(self.feature_names[feature_col_i])
             axis.set_title(self.feature_names[feature_col_i])
@@ -85,13 +87,13 @@ class MultivariateLinearRegression:
     def optimize(self):
         params = self.J_prime()
         # print('dw:', params['dw'])
-        new_theta = self._curr_theta - (self.learning_rate * params['dw'])
-        new_beta = self._curr_beta - (self.learning_rate * params['db'])
+        new_theta = self.theta - (self.learning_rate * params['dw'])
+        new_beta = self.beta - (self.learning_rate * params['db'])
         self.theta = new_theta
         self.beta = new_beta
 
     def linear(self, X):
-        return np.dot(X, self._curr_theta) + self._curr_beta
+        return np.dot(X, self.theta) + self.beta
 
     def J(self):
         loss = self.linear(self.X_trains) - self.Y_trains
@@ -127,11 +129,11 @@ if __name__ == "__main__":
     model = MultivariateLinearRegression(cal_housing_raw)
 
     model.view_data()
-    # model.analyze()
+    model.analyze()
     
     model.mean_normalize()
     model.view_data()
-    # model.analyze()
+    model.analyze()
     model.fit()
     
     
