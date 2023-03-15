@@ -59,14 +59,40 @@ class MultivariateLinearRegression:
         # block group longitude
         zeros = np.zeros((self.num_instances,))
         
+        # how do I keep the title without it being removed after plt.show()
         for feature_col_i in range(self.num_features):
+            
             curr_feature = self.X_trains[:, feature_col_i].reshape(-1)
             print(curr_feature.shape)
             print(zeros.shape)
             plt.scatter(curr_feature, zeros, alpha=0.25, marker='p', c='#036bfc')
             print(self.feature_names[feature_col_i])
             axis.set_title(self.feature_names[feature_col_i])
+            axis.set_title("")
             plt.show()
+
+        
+
+
+
+        # tickers = self.feature_names
+        # fig, axs = plt.subplots(nrows=3, ncols=2, figsize=(15, 12))
+        # plt.subplots_adjust(hspace=0.5)
+        # fig.suptitle("Daily closing prices", fontsize=18, y=0.95)
+
+        # # loop through tickers and axes
+        # for feature_col_i, object in enumerate(zip(tickers, axs.ravel())):
+        #     ticker, ax = object
+        #     curr_feature = self.X_trains[:, feature_col_i].reshape(-1)
+        #     print(curr_feature.shape)
+        #     print(zeros.shape)
+        #     ax.scatter(curr_feature, zeros, alpha=0.25, marker='p', c='#036bfc')
+
+        #     # chart formatting
+        #     ax.set_title(ticker.upper())
+        #     ax.set_xlabel("")
+
+        # plt.show()
     
     def mean_normalize(self):
         for feature_col_i in range(self.num_features):
