@@ -1,18 +1,17 @@
 import math
 import numpy as np
 import matplotlib.pyplot as plt
+import pandas as pd
 
 from sklearn.datasets import fetch_california_housing
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
 
 class MultivariateLinearRegression:
-    def __init__(self, data, epochs=10000, learning_rate=0.003, degree=6):
-        self.X_trains, self.X_tests, self.Y_trains, self.Y_tests = train_test_split(data['data'], data['target'], test_size=0.3, random_state=0)
+    def __init__(self, X, Y, epochs=10000, learning_rate=0.003, degree=6):
+        self.X_trains, self.X_tests, self.Y_trains, self.Y_tests = train_test_split(X, Y, test_size=0.3, random_state=0)
         self.num_features = self.X_trains.shape[1]
         self.num_instances = self.X_trains.shape[0]
-        self.feature_names = data['feature_names']
-        self.target_name = data['target_names']
         self._curr_theta = np.zeros((self.num_features))
         self._curr_beta = 0
         self.epochs = epochs
@@ -45,58 +44,50 @@ class MultivariateLinearRegression:
 
     def analyze(self):
         # see where each feature lies
-        fig = plt.figure(figsize=(7, 5))
-        axis = fig.add_subplot()
+        # sees the range where each feature lies
+        fig, axes = plt.subplots(4, 2, figsize=(15, 10))
+        fig.tight_layout(pad=1)
 
-        # features
-        # median income in block group
-        # median house age in block group
-        # average number of rooms per household
-        # average number of bedrooms per household
-        # block group population
-        # average number of household members
-        # block group latitude
-        # block group longitude
-        zeros = np.zeros((self.num_instances,))
+        # no. of instances and features
+        num_instances = self.X_trains.shape[0]
+        num_features = self.X_trains.shape[1]
+
+        # feature names
+        feature_names = ["median income", "median house age", "avg no. of rooms/household", "avg no. of bedrooms/household", 
+        "block group population", "avg no of household members", "block group latitude", "block group longitude"]
+        
+        zeros = np.zeros((num_instances,))
         
         # how do I keep the title without it being removed after plt.show()
-        for feature_col_i in range(self.num_features):
-            
+        for feature_col_i, axis in enumerate(axes.flat):
+            # print(feature_col_i)
             curr_feature = self.X_trains[:, feature_col_i].reshape(-1)
-            print(curr_feature.shape)
-            print(zeros.shape)
-            plt.scatter(curr_feature, zeros, alpha=0.25, marker='p', c='#036bfc')
-            print(self.feature_names[feature_col_i])
-            axis.set_title(self.feature_names[feature_col_i])
-            axis.set_title("")
-            plt.show()
+            # print(curr_feature)
+            # print(curr_feature.shape)
+            
+            axis.scatter(curr_feature, zeros, alpha=0.25, marker='p', c='#036bfc')
+            # print(feature_names[feature_col_i])
 
-        
+            axis.set_title(feature_names[feature_col_i])
+            # axis.set_title(f"feature [{feature_col_i}]")
+            
+        plt.show()
 
+    def plot_data(self):
+        fig = plt.figure(figsize=(15, 10))
+        axis = fig.add_subplot()
 
-
-        # tickers = self.feature_names
-        # fig, axs = plt.subplots(nrows=3, ncols=2, figsize=(15, 12))
-        # plt.subplots_adjust(hspace=0.5)
-        # fig.suptitle("Daily closing prices", fontsize=18, y=0.95)
-
-        # # loop through tickers and axes
-        # for feature_col_i, object in enumerate(zip(tickers, axs.ravel())):
-        #     ticker, ax = object
-        #     curr_feature = self.X_trains[:, feature_col_i].reshape(-1)
-        #     print(curr_feature.shape)
-        #     print(zeros.shape)
-        #     ax.scatter(curr_feature, zeros, alpha=0.25, marker='p', c='#036bfc')
-
-        #     # chart formatting
-        #     ax.set_title(ticker.upper())
-        #     ax.set_xlabel("")
-
-        # plt.show()
+        axis.scatter(self.X_trains[:, 0], self.X_trains[:, 1], alpha=0.25, c='#4248f5', marker='p', label='training data')
+        axis.scatter(self.X_tests[:, 0], self.X_tests[:, 1], alpha=0.25, c='#f542a1', marker='.', label='test data')
+        plt.xlabel('X1')
+        plt.ylabel('X2')
+        plt.legend()
+        plt.show()
     
     def mean_normalize(self):
         for feature_col_i in range(self.num_features):
             self.X_trains[:, feature_col_i] = (self.X_trains[:, feature_col_i] - np.average(self.X_trains[:, feature_col_i])) / np.std(self.X_trains[:, feature_col_i])
+            self.X_tests[:, feature_col_i] = (self.X_tests[:, feature_col_i] - np.average(self.X_tests[:, feature_col_i])) / np.std(self.X_tests[:, feature_col_i])
 
     def fit(self):
         # run algorithm for n epochs
@@ -118,9 +109,6 @@ class MultivariateLinearRegression:
         self.theta = new_theta
         self.beta = new_beta
 
-    def plot_data(self):
-        pass
-
     def linear(self, X):
         return np.dot(X, self.theta) + self.beta
 
@@ -139,11 +127,8 @@ class MultivariateLinearRegression:
         }
     
     def predict(self, is_training_set=True):
-        # predict training set
-        # predict test set
-        # if RMSE or root mean squared error is 0
-        # then prediction for new data and train data is 0
- 
+        # predicts both training set and test set. If RMSE or root mean squared 
+        # error is 0 then prediction for new data and train data is 0
         return (self.linear(self.X_trains), self.Y_trains) if is_training_set is True else (self.linear(self.X_tests), self.Y_tests)
     
     def check(self):
@@ -154,16 +139,22 @@ class MultivariateLinearRegression:
 
 
 if __name__ == "__main__":
-    cal_housing_raw = fetch_california_housing()
-    print(cal_housing_raw['target'])
-    model = MultivariateLinearRegression(cal_housing_raw)
+    data = pd.read_csv('./CaliforniaHousing/cal_housing.data', sep=',', header=None)
+    print(data)
+
+    X, Y = data.loc[:, 0:7].to_numpy(), data.loc[:, 8].to_numpy()
+    print(f"{X[:5]}\n{Y[:5]}")
+
+    model = MultivariateLinearRegression(X, Y)
 
     model.view_data()
-    # model.analyze()
+    model.analyze()
+    model.plot_data()
     
     model.mean_normalize()
-    # model.view_data()
-    # model.analyze()
+    model.analyze()
+    model.plot_data()
+
     model.fit()
     
     
