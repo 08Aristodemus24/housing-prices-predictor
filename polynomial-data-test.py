@@ -7,7 +7,7 @@ from sklearn.preprocessing import PolynomialFeatures, StandardScaler
 
 # Pipeline is akin to a Sequential class in tf where architecture of model is defined
 from sklearn.pipeline import Pipeline
-from sklearn.metrics import r2_score, mean_squared_error
+from sklearn.metrics import mean_squared_error
 import pandas as pd
 
 data = pd.read_csv('./CaliforniaHousing/cal_housing.data', sep=',', header=None)
