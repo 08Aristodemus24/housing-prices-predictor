@@ -7,7 +7,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
 
 class MultivariateLinearRegression:
-    def __init__(self, data, epochs=10000, learning_rate=0.003):
+    def __init__(self, data, epochs=10000, learning_rate=0.003, degree=6):
         self.X_trains, self.X_tests, self.Y_trains, self.Y_tests = train_test_split(data['data'], data['target'], test_size=0.3, random_state=0)
         self.num_features = self.X_trains.shape[1]
         self.num_instances = self.X_trains.shape[0]
@@ -118,6 +118,9 @@ class MultivariateLinearRegression:
         self.theta = new_theta
         self.beta = new_beta
 
+    def plot_data(self):
+        pass
+
     def linear(self, X):
         return np.dot(X, self.theta) + self.beta
 
@@ -143,7 +146,7 @@ class MultivariateLinearRegression:
  
         return (self.linear(self.X_trains), self.Y_trains) if is_training_set is True else (self.linear(self.X_tests), self.Y_tests)
     
-    def evaluate(self):
+    def check(self):
         Y_preds = self.predict(self.X_trains)
         for i in range(self.num_instances):
             print(Y_preds[i], self.Y_trains[i])
@@ -152,18 +155,19 @@ class MultivariateLinearRegression:
 
 if __name__ == "__main__":
     cal_housing_raw = fetch_california_housing()
+    print(cal_housing_raw['target'])
     model = MultivariateLinearRegression(cal_housing_raw)
 
     model.view_data()
-    model.analyze()
+    # model.analyze()
     
     model.mean_normalize()
-    model.view_data()
-    model.analyze()
+    # model.view_data()
+    # model.analyze()
     model.fit()
     
     
-    Y_preds, Y_tests = model.predict(is_training_set=False)
+    Y_preds, Y_tests = model.predict(is_training_set=True)
     mse = mean_squared_error(Y_tests, Y_preds)
     rmse = math.sqrt(mse)
     print('mse: {}'.format(mse))
