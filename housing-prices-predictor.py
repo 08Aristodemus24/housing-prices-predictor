@@ -3,7 +3,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from sklearn.datasets import fetch_california_housing
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
 
@@ -161,5 +160,5 @@ if __name__ == "__main__":
     Y_preds, Y_tests = model.predict(is_training_set=True)
     mse = mean_squared_error(Y_tests, Y_preds)
     rmse = math.sqrt(mse)
-    print('mse: {}'.format(mse))
-    print('rmse: {}'.format(rmse))
+    print('mse: {:.2%}'.format(mse))
+    print('rmse: {:.2%}'.format(rmse))
