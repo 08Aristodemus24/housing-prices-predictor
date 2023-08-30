@@ -166,8 +166,8 @@ def plot_train_cross_costs(model):
     styles = [('p:', '#5d42f5'), ('h-', '#fc03a5')]
 
     # for index, epoch in enumerate(range(epochs)):
-    axis.plot(np.arange(epochs) + 1, train_costs, styles[0][0], color=styles[0][1], alpha=0.5, label='train mse')
-    axis.plot(np.arange(epochs) + 1, cross_costs, styles[1][0], color=styles[1][1], alpha=0.5, label='cross mse')
+    axis.plot(np.arange(epochs) + 1, train_costs, styles[0][0], color=styles[0][1], alpha=0.1, label='train mse')
+    axis.plot(np.arange(epochs) + 1, cross_costs, styles[1][0], color=styles[1][1], alpha=0.1, label='cross mse')
 
     axis.set_title(f'cost per epoch for training and cross validation data splits')
     axis.set_ylabel('metric value')
@@ -176,6 +176,7 @@ def plot_train_cross_costs(model):
 
     # save figure
     plt.savefig(f'./figures & images/cost per epoch for training and cross validation data splits.png')
+    plt.show()
 
 
 
