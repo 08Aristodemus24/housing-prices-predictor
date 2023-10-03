@@ -7,7 +7,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
 
 class MultivariateLinearRegression:
-    def __init__(self, X, Y, epochs=10000, learning_rate=0.003, degree=6):
+    def __init__(self, X, Y, epochs=10000, learning_rate=0.003, lambda_=0):
         self.X_trains, self.X_cross, self.Y_trains, self.Y_cross = train_test_split(X, Y, test_size=0.3, random_state=0)
 
         self.num_features = self.X_trains.shape[1]
@@ -18,9 +18,16 @@ class MultivariateLinearRegression:
         self._curr_beta = 0
         self.epochs = epochs
         self.learning_rate = learning_rate
+        self.lambda_ = lambda_
         
-        self.train_costs = []
-        self.cross_costs = []
+        self.history = {
+            'history': {
+                'mean_squared_error': [],
+                'val_mean_squared_error': [],
+                'root_mean_squared_error': [],
+                'val_root_mean_squared_error': []
+            }
+        }
 
     @property
     def theta(self):
@@ -99,18 +106,24 @@ class MultivariateLinearRegression:
         # run algorithm for n epochs
         for epoch in range(self.epochs):
             # calculate cost per epoch for training and testing
-            train_cost = self.J(self.X_trains, self.Y_trains)
-            cross_cost = self.J(self.X_cross, self.Y_cross)
+            train_mse = self.J_MSE(self.X_trains, self.Y_trains)
+            cross_mse = self.J_MSE(self.X_cross, self.Y_cross)
+            train_rmse = self.J_RMSE(train_mse)
+            cross_rmse = self.J_RMSE(cross_mse)
 
             if epoch % 1000 == 0:
                 print('current theta: {} \n'.format(self.theta))
                 print('current beta: {} \n'.format(self.beta))
-                print('current train cost: {} \n'.format(train_cost))
-                print('current cross cost: {} \n'.format(train_cost))
+                print('current train MSE: {} \n'.format(train_mse))
+                print('current train RMSE: {} \n'.format(train_rmse))
+                print('current cross MSE: {} \n'.format(cross_mse))
+                print('current cross RMSE: {} \n'.format(cross_mse))
 
             # save each data splits cost
-            self.train_costs.append(train_cost)
-            self.cross_costs.append(cross_cost)
+            self.history['history']['mean_squared_error'].append(train_mse)
+            self.history['history']['val_mean_squared_error'].append(cross_mse)
+            self.history['history']['root_mean_squared_error'].append(train_rmse)
+            self.history['history']['val_root_mean_squared_error'].append(cross_rmse)
 
             # calculate gradients and then update coefficients
             self.optimize()
@@ -128,15 +141,18 @@ class MultivariateLinearRegression:
     def linear(self, X):
         return np.dot(X, self.theta) + self.beta
 
-    def J(self, X, Y):
+    def J_MSE(self, X, Y):
         num_instances = X.shape[0]
 
         loss = self.linear(X) - Y
-        return np.dot(loss.T, loss) / (2 * num_instances)
+        return (np.dot(loss.T, loss) / (2 * num_instances)) + ((self.lambda_ * np.dot(self.theta, self.theta.T)) / (2 * num_instances))
+
+    def J_RMSE(self, mse):
+        return np.sqrt(mse)
 
     def J_prime(self):
         error = self.linear(self.X_trains) - self.Y_trains
-        dw =  np.dot(self.X_trains.T, error) / self.train_num_instances
+        dw =  (np.dot(self.X_trains.T, error) / self.train_num_instances) + ((self.lambda_ * self.theta) / self.train_num_instances)
         db = np.sum(error, keepdims=True) / self.train_num_instances
         
         return {
@@ -157,26 +173,32 @@ class MultivariateLinearRegression:
 
 
 def plot_train_cross_costs(model):
-    train_costs, cross_costs = model.train_costs, model.cross_costs
+    metrics_to_use = list(model.history['history'].items())
     epochs = model.epochs
 
-    figure = plt.figure(figsize=(15, 10))
-    axis = figure.add_subplot()
+    styles = [
+        ('p:', '#f54949'), 
+        ('h-', '#f59a45'), 
+        ('o--', '#afb809'), 
+        ('x:','#51ad00'),]
+    
+    
+    for index in range(0, len(metrics_to_use) - 1, 2):
+        plt.figure(figsize=(15, 10))
+        metric_indeces = (index, index + 1)
 
-    styles = [('p:', '#5d42f5'), ('h-', '#fc03a5')]
+        for j, (key, value) in enumerate(metrics_to_use[metric_indeces[0]: metric_indeces[1] + 1]):
+            plt.plot(np.arange(epochs) + 1, value, styles[metric_indeces[j]][0], color=styles[metric_indeces[j]][1], alpha=0.1, label=key)
 
-    # for index, epoch in enumerate(range(epochs)):
-    axis.plot(np.arange(epochs) + 1, train_costs, styles[0][0], color=styles[0][1], alpha=0.1, label='train mse')
-    axis.plot(np.arange(epochs) + 1, cross_costs, styles[1][0], color=styles[1][1], alpha=0.1, label='cross mse')
+        plt.title(f'cost per epoch for training and cross validation data splits')
+        plt.ylabel('metric value')
+        plt.xlabel('epochs')
+        plt.legend()
 
-    axis.set_title(f'cost per epoch for training and cross validation data splits')
-    axis.set_ylabel('metric value')
-    axis.set_xlabel('epochs')
-    axis.legend()
-
-    # save figure
-    plt.savefig(f'./figures & images/cost per epoch for training and cross validation data splits.png')
-    plt.show()
+        # save figure
+        plt.savefig(f'./figures & images/{metrics_to_use[index][0]} per epoch for training and cross validation data splits.png')
+        plt.show()
+        plt.figure().clear()
 
 
 
