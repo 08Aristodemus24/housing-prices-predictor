@@ -11,7 +11,10 @@
 8. if `pip` exists or install is done run `pip install -r requirements.txt` in the directory you are currently in
 
 # Things to implement in the future:
-- add regularizer to improve RMSE
 - instead of a linear model implement a function to engineer new features that results in a more polynomial equation to use as our model:
 - note that we have to normalize data first before passing data to map_feature() which engineers new features out of the current features
 to make the equation more polynomial
+- add normalizer for predictor
+
+# References:
+* https://flask.palletsprojects.com/en/3.0.x/patterns/wtforms/
