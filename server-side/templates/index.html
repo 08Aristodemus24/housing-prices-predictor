@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
+</head>
+<body>
+    <main class="main-content">
+        <section class="predict-section">
+            <div class="predict-content">
+                <div class="predict-header-container">
+                    <h1>{{ title }}</h1>
+                </div>
+                <div class="form-container">
+                    <form class="form" action="/predict/json" method="post">
+                        <div class="long-container">
+                            <label for="longitude" class="long-label">Longitude</label>
+                            <input type="text" name="longitude" id="longitude" class="long-field" placeholder="Longitude"/>
+                        </div>
+                        <div class="lat-container">
+                            <label for="latitude" class="lat-label">Latitude</label>
+                            <input type="text" name="latitude" id="latitude" class="lat-field" placeholder="Latitude"/>
+                        </div>
+                        <div class="house-med-age-container">
+                            <label for="housing-medina-age" class="house-med-age-label">Housing Median Age</label>
+                            <input type="text" name="housing-median-age" id="housing-median-age" class="house-med-age-field" placeholder="Housing Median Age"/>
+                        </div>
+                        <div class="total-rooms-container">
+                            <label for="total-rooms" class="total-rooms-label">Total Rooms</label>
+                            <input type="text" name="total-rooms" id="total-rooms" class="total-rooms-field" placeholder="Total Rooms"/>
+                        </div>
+                        <div class="total-bedrooms-container">
+                            <label for="total-bedrooms" class="total-bedrooms-label">Total Bedrooms</label>
+                            <input type="text" name="total-bedrooms" id="total-bedrooms" class="total-bedrooms-field" placeholder="Total Bedrooms"/>
+                        </div>
+                        <div class="population-container">
+                            <label for="population" class="population-label">Population</label>
+                            <input type="text" name="population" id="population" class="population-field" placeholder="Population"/>
+                        </div>
+                        <div class="households-container">
+                            <label for="households" class="households-label">Households</label>
+                            <input type="text" name="households" id="households" class="households-field" placeholder="Households"/>
+                        </div>
+                        <div class="med-income-container">
+                            <label for="median-income" class="med-income-label">Median Income</label>
+                            <input type="text" name="median-income" id="median-income" class="med-income-field" placeholder="Median Income"/>
+                        </div>
+                        <button type="submit" class="submit-btn">Predict</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+</body>
+</html>
