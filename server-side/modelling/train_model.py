@@ -108,7 +108,7 @@ class MultivariateLinearRegression:
         for feature_col_i in range(self.num_features):
             # we ought to normalize once each data split is established to prevent data leakage
             self.X_trains[:, feature_col_i] = (self.X_trains[:, feature_col_i] - np.average(self.X_trains[:, feature_col_i])) / np.std(self.X_trains[:, feature_col_i])
-            self.X_cross[:, feature_col_i] = (self.X_cross[:, feature_col_i] - np.average(self.X_cross[:, feature_col_i])) / np.std(self.X_cross[:, feature_col_i])
+            self.X_cross[:, feature_col_i] = (self.X_cross[:, feature_col_i] - np.average(self.X_trains[:, feature_col_i])) / np.std(self.X_trains[:, feature_col_i])
 
     def fit(self):
         # run algorithm for n epochs
