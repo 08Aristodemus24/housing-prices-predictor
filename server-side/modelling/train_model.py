@@ -6,6 +6,7 @@ import json
 import os
 
 from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import mean_squared_error
 
 class MultivariateLinearRegression:
@@ -105,12 +106,21 @@ class MultivariateLinearRegression:
         plt.show()
     
     def mean_normalize(self):
-        for feature_col_i in range(self.num_features):
-            # we ought to normalize once each data split is established to prevent data leakage
-            self.X_trains[:, feature_col_i] = (self.X_trains[:, feature_col_i] - np.average(self.X_trains[:, feature_col_i])) / np.std(self.X_trains[:, feature_col_i])
-            self.X_cross[:, feature_col_i] = (self.X_cross[:, feature_col_i] - np.average(self.X_trains[:, feature_col_i])) / np.std(self.X_trains[:, feature_col_i])
+        # for feature_col_i in range(self.num_features):
+        #     # we ought to normalize once each data split is established to prevent data leakage
+        #     self.X_trains[:, feature_col_i] = (self.X_trains[:, feature_col_i] - np.average(self.X_trains[:, feature_col_i])) / np.std(self.X_trains[:, feature_col_i])
+        #     self.X_cross[:, feature_col_i] = (self.X_cross[:, feature_col_i] - np.average(self.X_trains[:, feature_col_i])) / np.std(self.X_trains[:, feature_col_i])
+        scaler = StandardScaler()
+        self.X_trains = scaler.fit_transform(self.X_trains)
+        self.X_cross = scaler.transform(self.X_cross)
 
-    def fit(self):
+    def init_params(self):
+        self.theta = np.random.rand(self.num_features,)
+
+    def fit(self, show_logs=True):
+        # initialize coefficients
+        self.init_params()
+
         # run algorithm for n epochs
         for epoch in range(self.epochs):
             # calculate cost per epoch for training and testing
@@ -119,7 +129,7 @@ class MultivariateLinearRegression:
             train_rmse = self.J_RMSE(train_mse)
             cross_rmse = self.J_RMSE(cross_mse)
 
-            if epoch % 1000 == 0:
+            if epoch % 1000 == 0 and show_logs == True:
                 print('current theta: {} \n'.format(self.theta))
                 print('current beta: {} \n'.format(self.beta))
                 print('current train MSE: {} \n'.format(train_mse))
@@ -152,14 +162,15 @@ class MultivariateLinearRegression:
     def J_MSE(self, X, Y):
         num_instances = X.shape[0]
 
-        loss = self.linear(X) - Y
-        return (np.dot(loss.T, loss) / (2 * num_instances)) + ((self.lambda_ * np.dot(self.theta, self.theta.T)) / (2 * num_instances))
+        error = self.linear(X) - Y
+        return (np.dot(error.T, error) / (2 * num_instances)) + ((self.lambda_ * np.dot(self.theta, self.theta.T)) / (2 * num_instances))
 
     def J_RMSE(self, mse):
         return np.sqrt(mse)
 
     def J_prime(self):
         error = self.linear(self.X_trains) - self.Y_trains
+        print(f'error: {error}')
         dw =  (np.dot(self.X_trains.T, error) / self.train_num_instances) + ((self.lambda_ * self.theta) / self.train_num_instances)
         db = np.sum(error, keepdims=True) / self.train_num_instances
         
@@ -259,10 +270,12 @@ if __name__ == "__main__":
     model.plot_data()
     
     model.mean_normalize()
+
+    model.view_data()
     model.analyze()
     model.plot_data()
 
-    model.fit()
+    model.fit(show_logs=False)
     Y_preds, Y_tests = model.validate(is_training_set=True)
     
     view_model_metric_values(Y_tests, Y_preds)
