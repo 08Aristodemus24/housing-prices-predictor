@@ -10,11 +10,11 @@
 7. if it is there then move to step 8, if not then install `pip` by typing `conda install pip`
 8. if `pip` exists or install is done run `pip install -r requirements.txt` in the directory you are currently in
 
-# Things to implement in the future:
+# Things to implement:
 - instead of a linear model implement a function to engineer new features that results in a more polynomial equation to use as our model:
 - note that we have to normalize data first before passing data to map_feature() which engineers new features out of the current features
 to make the equation more polynomial
-- add normalizer for predictor
+- I'm actually passing unnormalized X values in the test model so I need to find a way to recover previous standard deviation and mean calculated from the training the data which was used to normalized both training and cross validation data
 
 # References:
 * https://flask.palletsprojects.com/en/3.0.x/patterns/wtforms/
