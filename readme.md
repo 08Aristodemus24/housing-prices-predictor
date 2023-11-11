@@ -1,4 +1,4 @@
-# **PRODUCTION DONE. AWAITING DEPLOYMENT**  
+# **DEVELOPMENT FINISHED, AWAITING DEPLOYMENT**
 
 # Usage:
 1. clone repository with `git clone https://github.com/08Aristodemus24/housing-prices-predictor.git`
