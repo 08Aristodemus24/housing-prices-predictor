@@ -57,6 +57,7 @@ body{
 
     /* design */
     content: '';
+    /* 'https://raw.githubusercontent.com/08Aristodemus24/housing-prices-predictor/master/server-side/static/mediafiles/1332044.jpg' */
     background-image: url('./mediafiles/1332044.png');
     background-attachment: fixed;
     background-position: center;
