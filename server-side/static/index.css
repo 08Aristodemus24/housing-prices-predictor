@@ -150,7 +150,7 @@ body{
     /* design */
     font-family: 'Nunito Sans', sans-serif;
     font-weight: 300;
-    font-size: 12px;
+    font-size: clamp(12px, 1vw, 1rem);
     color: white;
     /* outline: 1px solid brown; */
 
@@ -173,6 +173,7 @@ body{
     /* design */
     background-color: transparent;
     font-family: 'Nunito Sans', sans-serif;
+    font-size: clamp(12px, 1vw, 1rem);
     color: white;
     border-top: none;
     border-right: none;
@@ -191,7 +192,7 @@ body{
     /* design */
     background-color: transparent;
     font-family: 'Nunito Sans', sans-serif;
-    font-size: 12px;
+    font-size: clamp(12px, 1vw, 1rem);
     color: white;
     border: 1px solid white;
     
@@ -230,4 +231,64 @@ body{
 /* Microsoft Edge */
 ::-ms-input-placeholder{ 
     color: rgba(255, 255, 255, 0.075);
+}
+
+.prediction-container{
+    /* design */
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: clamp(14px, 2.1875vw, 22.4px);
+    color: white;
+
+    /* spacing */
+    margin-top: .5em;
+    margin-bottom: .5em;
+}
+
+.alert-container{
+    /* position */
+    position: fixed;
+    inset: 0;
+    margin: auto;
+    z-index: 20;
+
+    /* design */
+    opacity: 0%;
+    visibility: hidden;
+    background-color: rgba(0, 0, 0, 0.377);
+
+    /* transition */
+    transition: 
+        opacity 0.25s ease-in-out,
+        visibility 0.25s ease-in-out;
+}
+
+.alert-container.show{
+    opacity: 100%;
+    visibility: visible;
+}
+
+.alert-wrapper{
+    /* position */
+    position: absolute;
+    top: 0;
+    inset-inline: 0;
+    margin-inline: auto;
+
+    /* display */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    /* size */
+    height: 12.5%;
+    width: 25%;
+
+    /* design */
+    color: black;
+    text-align: center;
+    font-size: clamp(10px, 1vw, 1rem);
+    font-family: 'Nunito Sans', sans-serif;
+    font-weight: 300;
+    background-color: white;
+    /* outline: 1px solid; */
 }

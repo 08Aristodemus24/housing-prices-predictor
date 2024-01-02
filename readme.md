@@ -1,6 +1,9 @@
-# **DEVELOPMENT FINISHED, AWAITING DEPLOYMENT**
+# **WEBSITE DEPLOYED AND IN PRODUCTION**
 
-# Usage:
+# Web App Usage:
+1. because API can both be used as an application with a working UI and as an endpoint navigating instead to url https://housing-prices-predictor.vercel.app/predict/json with the necessary data payload using postman will return a json response. But navigating to https://housing-prices-predictor.vercel.app/predict once input data is entered will redirect to the base url https://housing-prices-predictor.vercel.app/ with the predicted value
+
+# Source Code Usage:
 1. clone repository with `git clone https://github.com/08Aristodemus24/housing-prices-predictor.git`
 2. navigate to directory with `readme.md` and `requirements.txt` file
 3. run command; `conda create -n <name of env e.g. housing-prices-predictor> python=3.11.2`. Note that 3.11.2 must be the python version otherwise packages to be installed would not be compatible with a different python version
