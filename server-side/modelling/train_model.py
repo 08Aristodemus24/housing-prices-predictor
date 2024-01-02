@@ -9,10 +9,12 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import mean_squared_error
 
+from argparse import ArgumentParser
+
 class MultivariateLinearRegression:
     def __init__(self, X=None, Y=None, epochs=10000, learning_rate=0.003, lambda_=0):
         if (X is not None) and (Y is not None):
-            self.X_trains, self.X_cross, self.Y_trains, self.Y_cross = train_test_split(X, Y, test_size=0.3, random_state=0)
+            self.X_trains, self.X_cross, self.Y_trains, self.Y_cross = train_test_split(X, Y, test_size=0.3, random_state=0, shuffle=True)
 
             self.num_features = self.X_trains.shape[1]
             self.train_num_instances = self.X_trains.shape[0]
@@ -33,7 +35,9 @@ class MultivariateLinearRegression:
             }
 
         self._curr_theta = np.zeros((None))
-        self._curr_beta = 0
+        self._curr_beta = 0.0
+        self._mean = np.zeros((None))
+        self._std_dev = np.zeros((None))
 
     @property
     def theta(self):
@@ -43,6 +47,14 @@ class MultivariateLinearRegression:
     def beta(self):
         return self._curr_beta
     
+    @property
+    def mean(self):
+        return self._mean
+
+    @property
+    def std_dev(self):
+        return self._std_dev
+
     @theta.setter
     def theta(self, new_theta):
         self._curr_theta = new_theta
@@ -50,6 +62,14 @@ class MultivariateLinearRegression:
     @beta.setter
     def beta(self, new_beta):
         self._curr_beta = new_beta
+
+    @mean.setter
+    def mean(self, new_mean):
+        self._mean = new_mean
+
+    @std_dev.setter
+    def std_dev(self, new_std):
+        self._std_dev = new_std
 
     def view_data(self):
         print('X_trains: {} \n'.format(self.X_trains))
@@ -71,8 +91,8 @@ class MultivariateLinearRegression:
         num_features = self.X_trains.shape[1]
 
         # feature names
-        feature_names = ["median income", "median house age", "avg no. of rooms/household", "avg no. of bedrooms/household", 
-        "block group population", "avg no of household members", "block group latitude", "block group longitude"]
+        feature_names = ["longitude", "latitude", "avg. housing age", "total no. of rooms", 
+        "total no. of bedrooms", "population", "households", "avg. income"]
         
         zeros = np.zeros((num_instances,))
         
@@ -110,9 +130,20 @@ class MultivariateLinearRegression:
         #     # we ought to normalize once each data split is established to prevent data leakage
         #     self.X_trains[:, feature_col_i] = (self.X_trains[:, feature_col_i] - np.average(self.X_trains[:, feature_col_i])) / np.std(self.X_trains[:, feature_col_i])
         #     self.X_cross[:, feature_col_i] = (self.X_cross[:, feature_col_i] - np.average(self.X_trains[:, feature_col_i])) / np.std(self.X_trains[:, feature_col_i])
+
+        # instantiate a standard scaler object
         scaler = StandardScaler()
+
+        # "train" the standard scaler on the training data
         self.X_trains = scaler.fit_transform(self.X_trains)
+
+        # normalize the cross validation data on the 
+        # training datas mean and standard deviation
         self.X_cross = scaler.transform(self.X_cross)
+
+        # save also the std deviation and mean for later testing
+        self.mean = scaler.mean_
+        self.std_dev = scaler.scale_
 
     def init_params(self):
         self.theta = np.random.rand(self.num_features,)
@@ -120,6 +151,9 @@ class MultivariateLinearRegression:
     def fit(self, show_logs=True):
         # initialize coefficients
         self.init_params()
+
+        # show mean and std
+        print(f"mean and std: {self.mean} {self.std_dev}")
 
         # run algorithm for n epochs
         for epoch in range(self.epochs):
@@ -129,7 +163,7 @@ class MultivariateLinearRegression:
             train_rmse = self.J_RMSE(train_mse)
             cross_rmse = self.J_RMSE(cross_mse)
 
-            if epoch % 1000 == 0 and show_logs == True:
+            if epoch % 1000 == 0:
                 print('current theta: {} \n'.format(self.theta))
                 print('current beta: {} \n'.format(self.beta))
                 print('current train MSE: {} \n'.format(train_mse))
@@ -144,17 +178,20 @@ class MultivariateLinearRegression:
             self.history['history']['val_root_mean_squared_error'].append(cross_rmse)
 
             # calculate gradients and then update coefficients
-            self.optimize()
+            self.optimize(show_logs=show_logs)
         
         print('DONE')
 
-    def optimize(self):
+    def optimize(self, show_logs):
         params = self.J_prime()
-        # print('dw:', params['dw'])
         new_theta = self.theta - (self.learning_rate * params['dw'])
         new_beta = self.beta - (self.learning_rate * params['db'])
         self.theta = new_theta
         self.beta = new_beta
+
+        if show_logs == True:
+            error = params['error']
+            print(f'error: {error}')
 
     def linear(self, X):
         return np.dot(X, self.theta) + self.beta
@@ -170,11 +207,11 @@ class MultivariateLinearRegression:
 
     def J_prime(self):
         error = self.linear(self.X_trains) - self.Y_trains
-        print(f'error: {error}')
         dw =  (np.dot(self.X_trains.T, error) / self.train_num_instances) + ((self.lambda_ * self.theta) / self.train_num_instances)
         db = np.sum(error, keepdims=True) / self.train_num_instances
-        
+
         return {
+            'error': error,
             'dw': dw,
             'db': db
         }
@@ -190,12 +227,18 @@ class MultivariateLinearRegression:
             print(Y_preds[i], self.Y_trains[i])
 
     def predict(self, X):
+        # normalize on training mean and standard dev first
+        X = (X - self.mean) / self.std_dev
+
+        # predict then return prediction value
         return self.linear(X)
 
     def save_weights(self):
-        coefficients = {
+        meta_data = {
             'non-bias': self.theta.tolist(),
-            'bias': self.beta.tolist()[0]
+            'bias': self.beta.tolist()[0],
+            'mean': self.mean.tolist(),
+            'std_dev': self.std_dev.tolist()
         }
 
         # if directory weights does not already exist create 
@@ -203,17 +246,19 @@ class MultivariateLinearRegression:
         if os.path.exists('./weights') != True:
             os.mkdir('./weights')
         
-        with open('./weights/coefficients.json', 'w') as out_file:
-            json.dump(coefficients, out_file)
+        with open('./weights/meta_data.json', 'w') as out_file:
+            json.dump(meta_data, out_file)
             out_file.close()
         
     def load_weights(self, file_path: str):
         with open(file_path, "r") as in_file:
-            coefficients = json.load(in_file)
+            meta_data = json.load(in_file)
             in_file.close()
 
-        self.theta = np.array(coefficients['non-bias'])
-        self.beta = coefficients['bias']
+        self.theta = np.array(meta_data['non-bias'])
+        self.beta = meta_data['bias']
+        self.mean = np.array(meta_data['mean'])
+        self.std_dev = np.array(meta_data['std_dev'])
 
 
 
@@ -257,30 +302,46 @@ def view_model_metric_values(Y_tests, Y_preds):
 
 
 if __name__ == "__main__":
+    # optional arguments
+    parser = ArgumentParser()
+    parser.add_argument('--show_logs', type=str, default=True, help='flag whether to show coeffcieints every 1000 epochs during training')
+
+    # reading data
     data = pd.read_csv('./CaliforniaHousing/cal_housing.data', sep=',', header=None)
     print(data)
 
+    # preprocessing X and Y data
     X, Y = data.loc[:, 0:7].to_numpy(), data.loc[:, 8].to_numpy()
     print(f"{X[:5]}\n{Y[:5]}")
 
+    # instantiating model
     model = MultivariateLinearRegression(X, Y)
 
+    # viewing and analyzing features of data through visualization
     model.view_data()
     model.analyze()
     model.plot_data()
     
+    # normalizing data for faster and more accurate training
     model.mean_normalize()
 
+    # viewing and analyzing features of data 
+    # through visualization after normalization
     model.view_data()
     model.analyze()
     model.plot_data()
 
+    # training model
     model.fit(show_logs=False)
+
+    # validating model
     Y_preds, Y_tests = model.validate(is_training_set=True)
     
+    # viewing metric values on training and cross validation data
     view_model_metric_values(Y_tests, Y_preds)
     plot_train_cross_costs(model)
 
+    # saving weights for deployment and testing
     model.save_weights()
 
     

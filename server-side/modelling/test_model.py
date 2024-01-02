@@ -12,7 +12,7 @@ if __name__ == "__main__":
     print(f"{X[:5]}\n{Y[:5]}")
 
     model = MultivariateLinearRegression()
-    model.load_weights('./weights/coefficients.json')
+    model.load_weights('./weights/meta_data.json')
 
     Y_preds = model.predict(X)
     view_model_metric_values(Y, Y_preds)
