@@ -2,6 +2,7 @@
 
 # Web App Usage:
 1. because API can both be used as an application with a working UI and as an endpoint navigating instead to url https://housing-prices-predictor.vercel.app/predict/json with the necessary data payload using postman will return a json response. But navigating to https://housing-prices-predictor.vercel.app/predict once input data is entered will redirect to the base url https://housing-prices-predictor.vercel.app/ with the predicted value
+2. local machine usage will be to simply navigate to `/server-side` directory then assuming all dependencies are installed by following **Source Code Usage** instructions below just run python index.py and wait for `localhost/127.0.0.1` server at port `5000` to start e.g. `https://127.0.0.1:5000`
 
 # Source Code Usage:
 1. clone repository with `git clone https://github.com/08Aristodemus24/housing-prices-predictor.git`
