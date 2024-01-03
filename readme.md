@@ -1,11 +1,11 @@
 # **DEVELOPMENT FINISHED, DEPLOYMENT PENDING DUE TO EXCEEDING FILE SIZE OF 250MB**
 
 # Demo:
-<img align="center" src="https://github.com/08Aristodemus24/housing-prices-predictor/blob/master/web%app%1.png" alt="michaelcueva" style="max-width: 100%"/>
+<img align="center" src="https://github.com/08Aristodemus24/housing-prices-predictor/blob/master/web%20app%201.png" alt="michaelcueva" style="max-width: 100%"/>
 <br/>
-<img align="center" src="https://github.com/08Aristodemus24/housing-prices-predictor/blob/master/web%app%2.png" alt="michaelcueva" style="max-width: 100%"/>
+<img align="center" src="https://github.com/08Aristodemus24/housing-prices-predictor/blob/master/web%20app%202.png" alt="michaelcueva" style="max-width: 100%"/>
 <br/>
-<img align="center" src="https://github.com/08Aristodemus24/housing-prices-predictor/blob/master/web%app%3.png" alt="michaelcueva" style="max-width: 100%"/>
+<img align="center" src="https://github.com/08Aristodemus24/housing-prices-predictor/blob/master/web%20app%203.png" alt="michaelcueva" style="max-width: 100%"/>
 
 # Web App Usage:
 1. because API can both be used as an application with a working UI and as an endpoint navigating instead to url https://housing-prices-predictor.vercel.app/predict/json with the necessary data payload using postman will return a json response. But navigating to https://housing-prices-predictor.vercel.app/predict once input data is entered will redirect to the base url https://housing-prices-predictor.vercel.app/ with the predicted value
